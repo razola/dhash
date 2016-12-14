@@ -7,6 +7,15 @@ module Dhash extend self
   end
 
   def calculate(file, hash_size = 8)
+    image = nil
+    if file.include?("http")
+      open(file) do |io|
+        image = Magick::Image.from_blob(io.read).first
+      end
+    else
+      image = Magick::Image.read(file).first
+    end
+   
     image = Magick::Image.read(file).first
     image = image.quantize(256, Magick::Rec601LumaColorspace, Magick::NoDitherMethod, 8)
     image = image.resize!(hash_size + 1, hash_size)
